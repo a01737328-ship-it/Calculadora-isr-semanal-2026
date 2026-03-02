@@ -1,1 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculadora ISR Semanal 2026</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f6f9;
+            text-align: center;
+            padding: 40px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 8px;
+        }
+        button {
+            background-color: #2e86de;
+            color: white;
+            padding: 10px;
+            border: none;
+            width: 95%;
+            border-radius: 5px;
+        }
+        .resultado {
+            margin-top: 20px;
+            background: #eaf2ff;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
 
+<div class="container">
+    <h2>CALCULADORA ISR SEMANAL 2026</h2>
+
+    <form method="POST">
+        <input type="number" step="any" name="sueldo" placeholder="Sueldo semanal" required>
+        <input type="number" step="any" name="he_doble" placeholder="Tiempo extra doble" required>
+        <input type="number" step="any" name="he_triple" placeholder="Tiempo extra triple" required>
+        <button type="submit">Calcular ISR</button>
+    </form>
+
+    {% if resultado %}
+    <div class="resultado">
+        <p><strong>Base gravable:</strong> ${{ resultado.base }}</p>
+        <p><strong>ISR retenido:</strong> ${{ resultado.isr }}</p>
+        <p><strong>Neto a pagar:</strong> ${{ resultado.neto }}</p>
+        <p><strong>HE doble exento:</strong> ${{ resultado.exento }}</p>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
