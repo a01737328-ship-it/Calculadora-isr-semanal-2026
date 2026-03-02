@@ -1,14 +1,10 @@
+from flask import Flask, render_template, request
 
-
-# ============================================
-#    CALCULADORA DE ISR SEMANAL 2026
-# ============================================
+app = Flask(__name__)
 
 UMA = 117.31
-LIMITE_EXENTO_HE_DOBLE = UMA * 5  # 5 UMAS DIARIAS
+LIMITE_EXENTO_HE_DOBLE = UMA * 5
 
-
-# Tabla ISR semanal 2026
 TARIFA_ISR = [
     (0.01, 194.46, 0.00, 1.92),
     (194.47, 1650.67, 3.71, 6.40),
@@ -33,50 +29,32 @@ def calcular_isr(base_gravable):
     return 0
 
 
-def main():
-    print("\n============================================")
-    print("     CALCULADORA DE ISR SEMANAL 2026")
-    print("============================================\n")
+@app.route("/", methods=["GET", "POST"])
+def index():
+    resultado = None
 
-    sueldo = float(input("Ingresa sueldo semanal: $ "))
-    he_doble = float(input("Ingresa tiempo extra doble: $ "))
-    he_triple = float(input("Ingresa tiempo extra triple: $ "))
+    if request.method == "POST":
+        sueldo = float(request.form["sueldo"])
+        he_doble = float(request.form["he_doble"])
+        he_triple = float(request.form["he_triple"])
 
-    # ------------------------------
-    # Cálculo tiempo extra doble
-    # ------------------------------
-    exento_he_doble = min(he_doble, LIMITE_EXENTO_HE_DOBLE)
-    gravado_he_doble = max(0, he_doble - LIMITE_EXENTO_HE_DOBLE)
+        exento_he_doble = min(he_doble, LIMITE_EXENTO_HE_DOBLE)
+        gravado_he_doble = max(0, he_doble - LIMITE_EXENTO_HE_DOBLE)
+        gravado_he_triple = he_triple
 
-    # ------------------------------
-    # Tiempo extra triple
-    # ------------------------------
-    gravado_he_triple = he_triple  # 100% gravado
+        base_gravable = sueldo + gravado_he_doble + gravado_he_triple
+        isr = calcular_isr(base_gravable)
+        neto = (sueldo + he_doble + he_triple) - isr
 
-    # ------------------------------
-    # Base gravable
-    # ------------------------------
-    base_gravable = sueldo + gravado_he_doble + gravado_he_triple
+        resultado = {
+            "base": round(base_gravable, 2),
+            "isr": isr,
+            "neto": round(neto, 2),
+            "exento": round(exento_he_doble, 2),
+        }
 
-    # ------------------------------
-    # Cálculo ISR
-    # ------------------------------
-    isr = calcular_isr(base_gravable)
-
-    neto = (sueldo + he_doble + he_triple) - isr
-
-    print("\n============== RESULTADO ==============\n")
-    print(f"Sueldo gravado:              ${sueldo:,.2f}")
-    print(f"HE doble exento:             ${exento_he_doble:,.2f}")
-    print(f"HE doble gravado:            ${gravado_he_doble:,.2f}")
-    print(f"HE triple gravado:           ${gravado_he_triple:,.2f}")
-    print("----------------------------------------")
-    print(f"Base gravable ISR:           ${base_gravable:,.2f}")
-    print(f"ISR retenido:                ${isr:,.2f}")
-    print("----------------------------------------")
-    print(f"Neto a pagar:                ${neto:,.2f}")
-    print("\n========================================\n")
+    return render_template("index.html", resultado=resultado)
 
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", port=81)
